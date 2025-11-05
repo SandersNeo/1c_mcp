@@ -82,6 +82,53 @@ MCP_ONEC_PASSWORD=password
 python -m src.py_server http --port 8000
 ```
 
+### Docker
+
+Запуск в контейнере для изоляции и упрощения развертывания.
+
+**Быстрый старт:**
+```bash
+# 1. Скопировать конфигурацию
+cp .env.docker.example .env
+
+# 2. Отредактировать .env (обязательно: MCP_ONEC_URL, MCP_ONEC_USERNAME, MCP_ONEC_PASSWORD)
+
+# 3. Запустить через docker-compose
+docker-compose up -d
+
+# Проверка
+curl http://localhost:8000/health
+```
+
+**Или напрямую через Docker:**
+```bash
+# Сборка образа
+docker build -t 1c-mcp-proxy .
+
+# Запуск с переменными окружения
+docker run -d \
+  -p 8000:8000 \
+  -e MCP_ONEC_URL=http://host.docker.internal/base \
+  -e MCP_ONEC_USERNAME=admin \
+  -e MCP_ONEC_PASSWORD=password \
+  --name mcp-proxy \
+  1c-mcp-proxy
+```
+
+**Важно про сеть:**
+- Если 1С на **том же хосте**: используйте `host.docker.internal` (Mac/Windows) или IP хоста `172.17.0.1` (Linux) вместо `localhost`
+- Если 1С на **другом сервере**: указывайте его реальный адрес как обычно
+
+**Логи:**
+```bash
+docker-compose logs -f
+```
+
+**Остановка:**
+```bash
+docker-compose down
+```
+
 ## Режимы работы
 
 ### Stdio режим
